@@ -1,0 +1,192 @@
+local wezterm = require("wezterm")
+
+local act = wezterm.action
+local config = {}
+
+config.check_for_updates = true
+
+config.front_end = "OpenGL"
+config.max_fps = 144
+--config.default_cursor_style = "BlinkingBlock"
+--config.animation_fps = 1
+--config.cursor_blink_rate = 500
+
+config.cursor_blink_ease_in = "Constant"
+config.cursor_blink_ease_out = "Constant"
+
+config.set_environment_variables = {
+	prompt = "$E]7;file://localhost/$P$E\\$E[32m$T$E[0m $E[35m$P$E[36m$_$G$E[0m ",
+}
+
+-- config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "--norc" }
+
+function Basename(s)
+	return string.gsub(s, "(.*[/\\])(.*)", "%2")
+end
+
+wezterm.on("format-tab-title", function(tab)
+	local pane = tab.active_pane
+	local process_name = Basename(pane.foreground_process_name)
+
+	local title = process_name .. ": " .. pane.pane_id
+
+	return {
+		{ Text = " " .. title .. " " },
+	}
+end)
+
+wezterm.on("update-right-status", function(window, pane)
+	local info = pane:get_foreground_process_info()
+	if info then
+		window:set_right_status(tostring(info.pid) .. " " .. Basename(info.executable) .. "   ")
+	else
+		window:set_right_status("")
+	end
+end)
+
+wezterm.on("toggle-tabbar", function(window, _)
+	local overrides = window:get_config_overrides() or {}
+	if overrides.enable_tab_bar == false then
+		-- tabbar shown
+		overrides.enable_tab_bar = true
+		overrides.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
+	else
+		-- tabbar hidden
+		overrides.enable_tab_bar = false
+		overrides.window_padding = { top = 20, left = 0, right = 0, bottom = 0 }
+	end
+	window:set_config_overrides(overrides)
+end)
+
+config.keys = {
+	{ key = "q", mods = "CTRL", action = act.EmitEvent("toggle-tabbar") },
+	{
+		key = "w",
+		mods = "CTRL|SHIFT",
+		action = wezterm.action.CloseCurrentTab({ confirm = true }),
+	},
+	{
+		key = "w",
+		mods = "CTRL",
+		action = wezterm.action.CloseCurrentPane({ confirm = true }),
+	},
+	{
+		key = "h",
+		mods = "CTRL|SHIFT",
+		action = wezterm.action({ ActivatePaneDirection = "Left" }),
+	},
+	{
+		key = "l",
+		mods = "CTRL|SHIFT",
+		action = wezterm.action({ ActivatePaneDirection = "Right" }),
+	},
+	{
+		key = "k",
+		mods = "CTRL|SHIFT",
+		action = wezterm.action({ ActivatePaneDirection = "Up" }),
+	},
+	{
+		key = "j",
+		mods = "CTRL|SHIFT",
+		action = wezterm.action({ ActivatePaneDirection = "Down" }),
+	},
+	{
+		key = "k",
+		mods = "CTRL|SHIFT|ALT",
+		action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }),
+	},
+	{
+		key = "j",
+		mods = "CTRL|SHIFT|ALT",
+		action = wezterm.action({ AdjustPaneSize = { "Down", 1 } }),
+	},
+	{
+		key = "h",
+		mods = "CTRL|SHIFT|ALT",
+		action = wezterm.action({ AdjustPaneSize = { "Left", 1 } }),
+	},
+	{
+		key = "l",
+		mods = "CTRL|SHIFT|ALT",
+		action = wezterm.action({ AdjustPaneSize = { "Right", 1 } }),
+	},
+	{ key = "m", mods = "SHIFT|CTRL", action = wezterm.action.Hide },
+	{ key = "n", mods = "SHIFT|CTRL", action = wezterm.action.ToggleFullScreen },
+	{ key = " ", mods = "SHIFT|ALT", action = act.SpawnCommandInNewTab({ cwd = "C:/Projects" }) },
+	{
+		key = "i",
+		mods = "CTRL|SHIFT|ALT",
+		action = wezterm.action.SpawnCommandInNewWindow({}),
+	},
+	{
+		key = "n",
+		mods = "CTRL|SHIFT|ALT",
+		action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
+	},
+	{
+		key = '!',
+		mods = 'SHIFT|ALT',
+		action = wezterm.action_callback(function(win, pane)
+		  local tab, window = pane:move_to_new_window()
+		end),
+	},
+}
+
+config.default_cwd = "C:/Projects"
+
+config.font = wezterm.font_with_fallback({
+	"UbuntuSansMono NF",
+	"FiraCode Nerd Font Mono",
+	"Cambria Math",
+})
+config.font_size = 11.5
+
+config.window_close_confirmation = "NeverPrompt"
+
+config.enable_scroll_bar = false
+config.enable_tab_bar = true
+
+config.skip_close_confirmation_for_processes_named = {
+	"bash",
+	"sh",
+	"zsh",
+	"fish",
+	"tmux",
+	"nu",
+	"cmd.exe",
+	"pwsh.exe",
+	"powershell.exe",
+	"nvim.exe",
+}
+
+config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
+
+config.color_scheme = "Dark Pastel"
+
+config.window_decorations = "NONE | RESIZE"
+
+config.window_background_opacity = 0.8
+
+-- wezterm.on("update-status", function(window)
+-- 	local backgrounds = {
+-- 		"nagisa-fuko.jpg",
+-- 		"bleach.jpg"
+-- 	}
+
+-- 	for _, item in pairs(window:mux_window():tabs_with_info()) do
+-- 		if item.is_active then
+-- 			window:set_config_overrides({
+-- 				background = {
+-- 					{
+-- 						source = {
+-- 							File = "C:/Users/Sanzhar/Pictures/wezterm_backs/" .. backgrounds[item.index + 1],
+-- 						},
+-- 					},
+-- 				},
+-- 			})
+-- 			break
+-- 		end
+-- 	end
+-- end)
+
+return config

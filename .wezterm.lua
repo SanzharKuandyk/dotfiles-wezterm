@@ -41,19 +41,14 @@ local function cwd_basename_from_pane(pane)
 end
 
 wezterm.on("format-tab-title", function(tab)
-	local pane = tab.active_pane
-	local process_name = Basename(pane.foreground_process_name)
+  local pane = tab.active_pane
+  local cwd = cwd_basename_from_pane(pane)
 
-	local cwd = cwd_basename_from_pane(pane)
+  local title = cwd ~= "" and cwd or "(no cwd)"
 
-	local title = process_name
-	if cwd ~= "" then
-		title = title .. " • " .. cwd
-	end
-
-	return {
-		{ Text = " " .. title .. " " },
-	}
+  return {
+    { Text = " " .. title .. " " },
+  }
 end)
 
 wezterm.on("update-right-status", function(window, pane)

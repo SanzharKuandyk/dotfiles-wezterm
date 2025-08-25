@@ -24,11 +24,32 @@ function Basename(s)
 	return string.gsub(s, "(.*[/\\])(.*)", "%2")
 end
 
+local function cwd_basename_from_pane(pane)
+  local cwd = pane and pane.current_working_dir
+  if not cwd then return "" end
+
+  if type(cwd) == "userdata" or type(cwd) == "table" then
+    local path = cwd.file_path or ""
+    path = path:gsub("[/\\]$", "")
+    return (path:match("([^/\\]+)$")) or path
+  end
+
+  local ok, parsed = pcall(function() return wezterm.url.parse(cwd) end)
+  local path = (ok and parsed and parsed.file_path) and parsed.file_path or cwd
+  path = path:gsub("[/\\]$", "")
+  return (path:match("([^/\\]+)$")) or path
+end
+
 wezterm.on("format-tab-title", function(tab)
 	local pane = tab.active_pane
 	local process_name = Basename(pane.foreground_process_name)
 
-	local title = process_name .. ": " .. pane.pane_id
+	local cwd = cwd_basename_from_pane(pane)
+
+	local title = process_name
+	if cwd ~= "" then
+		title = title .. " • " .. cwd
+	end
 
 	return {
 		{ Text = " " .. title .. " " },
@@ -124,10 +145,10 @@ config.keys = {
 		action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
 	},
 	{
-		key = '!',
-		mods = 'SHIFT|ALT',
-		action = wezterm.action_callback(function(win, pane)
-		  local tab, window = pane:move_to_new_window()
+		key = "!",
+		mods = "SHIFT|ALT",
+		action = wezterm.action_callback(function(_, pane)
+			pane:move_to_new_window()
 		end),
 	},
 }
@@ -163,7 +184,7 @@ config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 
 config.color_scheme = "Dark Pastel"
 
-config.window_decorations = "NONE | RESIZE"
+config.window_decorations = "NONE"
 
 config.window_background_opacity = 0.8
 

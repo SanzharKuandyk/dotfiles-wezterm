@@ -4,22 +4,32 @@ local act = wezterm.action
 local config = {}
 
 config.check_for_updates = true
-
 config.front_end = "OpenGL"
 config.max_fps = 60
---config.default_cursor_style = "BlinkingBlock"
---config.animation_fps = 1
---config.cursor_blink_rate = 500
 
 config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
 
--- prompt time & cwd
+-- set your wallpaper here
+local WALLPAPER = "C:/Users/Sanzhar/Pictures/walp/wezterm.jpg"
+
+config.background = {
+	{
+		source = {
+			File = WALLPAPER,
+		},
+		hsb = {
+			brightness = 0.07,
+			hue = 1.0,
+			saturation = 1.0,
+		},
+		opacity = 0.6,
+	},
+}
+
 config.set_environment_variables = {
 	prompt = "$E]7;file://localhost/$P$E\\$E[32m$T$E[0m $E[35m$P$E[36m$_$G$E[0m ",
 }
-
--- config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "--norc" }
 
 function Basename(s)
 	return string.gsub(s, "(.*[/\\])(.*)", "%2")
@@ -48,7 +58,6 @@ end
 wezterm.on("format-tab-title", function(tab)
 	local pane = tab.active_pane
 	local cwd = cwd_basename_from_pane(pane)
-
 	local title = cwd ~= "" and cwd or "(no cwd)"
 
 	return {
@@ -74,11 +83,9 @@ end)
 wezterm.on("toggle-tabbar", function(window, _)
 	local overrides = window:get_config_overrides() or {}
 	if overrides.enable_tab_bar == false then
-		-- tabbar shown
 		overrides.enable_tab_bar = true
 		overrides.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 	else
-		-- tabbar hidden
 		overrides.enable_tab_bar = false
 		overrides.window_padding = { top = 20, left = 0, right = 0, bottom = 0 }
 	end
@@ -197,30 +204,7 @@ config.skip_close_confirmation_for_processes_named = {
 }
 
 config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
-
 config.color_scheme = "Dark Pastel"
-
 config.window_decorations = "NONE"
-
-config.window_background_opacity = 0.8
-
--- wezterm.on("update-status", function(window)
--- 	local backgrounds = {
--- 	}
-
--- 	for _, item in pairs(window:mux_window():tabs_with_info()) do
--- 		if item.is_active then
--- 			window:set_config_overrides({
--- 				background = {
--- 					{
--- 						source = {
--- 						},
--- 					},
--- 				},
--- 			})
--- 			break
--- 		end
--- 	end
--- end)
 
 return config

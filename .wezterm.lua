@@ -21,9 +21,8 @@ config.background = {
 		hsb = {
 			brightness = 0.07,
 			hue = 1.0,
-			saturation = 1.0,
+			saturation = 0.9,
 		},
-		opacity = 0.6,
 	},
 }
 

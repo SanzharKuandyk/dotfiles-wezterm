@@ -10,21 +10,23 @@ config.max_fps = 60
 config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
 
+config.default_prog = { "cmd.exe", "/D", "/K" }
+
 -- set your wallpaper here
 local WALLPAPER = "C:/Users/Sanzhar/Pictures/walp/wezterm.jpg"
 
-config.background = {
-	{
-		source = {
-			File = WALLPAPER,
-		},
-		hsb = {
-			brightness = 0.07,
-			hue = 1.0,
-			saturation = 0.9,
-		},
-	},
-}
+--config.background = {
+--	{
+--		source = {
+--			File = WALLPAPER,
+--		},
+--		hsb = {
+--			brightness = 0.07,
+--			hue = 1.0,
+--			saturation = 0.9,
+--		},
+--	},
+--}
 
 config.set_environment_variables = {
 	prompt = "$E]7;file://localhost/$P$E\\$E[32m$T$E[0m $E[35m$P$E[36m$_$G$E[0m ",
